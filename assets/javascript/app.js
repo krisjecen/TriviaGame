@@ -26,7 +26,7 @@ var questions = {
 };
 
 console.log(questions.q1.text); // logs correctly "what color is the sky?"
-console.log(questions.q1.choices.incorrect2); // logs correctly "what color is the sky?"
+console.log(questions.q1.choices.incorrect2); // logs correctly "checkerboard"
 
 
 
