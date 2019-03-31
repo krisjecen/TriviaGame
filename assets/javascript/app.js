@@ -1,5 +1,7 @@
 // js for TriviaGame
 
+// add a window.onload function around everything
+
 // variables / objects
 var questionTimer = 5;
 var questionTimerRunning = false;
@@ -154,6 +156,12 @@ function triviaQuestion() {
     <p>${questions[nthQuestion].choices.two}</p><p>${questions[nthQuestion].choices.three}</p>
     <p>${questions[nthQuestion].choices.four}</p>`;
 
+    document.querySelector("#container").addEventListener("click", function(event) {
+        if (event.target.textContent === questions[nthQuestion].choices.correct) {
+            console.log(`you clicked ${questions[nthQuestion].choices.correct}`);
+        }
+    });
+
     setTimeout(showAnswer, 3200);
 
 
@@ -202,16 +210,18 @@ function showAnswer() {
 }
 
 function displayUserStats() {
+    // stop the answerTimer
     stopAT()
+    // reset the question counter
+    nthQuestion = 0;
     // clear out the other fields
     document.getElementById("questionCount").textContent = "";
     document.getElementById("questionTimer").textContent = "";
-    document.getElementById("triviaTextarea").textContent = "Here's how you did!";
     document.getElementById("triviaChoices").textContent = "";
 
     // display the user stats
-    document.getElementById("userResults").innerHTML = `<p>Correct answers: ${qCorrect}</p>
-    <p>Incorrect answers: ${qIncorrect}</p>`;
+    document.getElementById("triviaTextarea").innerHTML = `<p>Here's how you did!</><p>Correct answers: ${qCorrect}</p>
+    <p>Incorrect answers: ${qIncorrect}</p><p>Unanswered questions: ${qUnanswered}</p>`;
 
 
     // button for gameresults page -- still need to code it to reset the game tho!
