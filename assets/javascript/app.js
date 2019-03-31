@@ -1,8 +1,14 @@
 // js for TriviaGame
 
 // variables / objects
-var questionTimer = 3;
+var questionTimer = 5;
 var questionTimerRunning = false;
+var questionIntervalID = null;
+
+var answerTimer = 3;
+var answerTimerRunning = false;
+var answerIntervalID = null;
+
 var nthQuestion = 0;
 
 
@@ -44,32 +50,80 @@ console.log(questions.q1.choices.incorrect2); // logs correctly "checkerboard"
 
 // timer at the top of the page
 // gets reset on each new question
-document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
+//document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
 
 
+// i think i can delete this
+//questionIntervalID = setInterval(decrementQT, 1000);
 
-questionIntervalID = setInterval(decrementQT, 1000);
 
 // should i make general start / stop timer functions and pass in a value for their countdown times?
 // since the values will probably be different for question vs answer timing
 
+// question timer functions - stop, decrement, start
 function stopQT() {
-    questionTimerRunning = false;
-    clearInterval(questionIntervalID);
-    questionTimer = 3;
+    if (questionTimerRunning === true) {
+        questionTimerRunning = false;
+        clearInterval(questionIntervalID);
+        questionTimer = 0;
+        document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
+    }
 }
 
 function decrementQT() {
     if (questionTimerRunning === true) {
-        document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
-        questionTimer--;
         if (questionTimer === 0) {
             stopQT();
         }
+        document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
+        questionTimer--;
+        
     }
     
 }
 
+function startQT() {
+    if (questionTimerRunning === false) {
+        questionTimerRunning = true;
+        questionTimer = 5;
+        document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
+        questionIntervalID = setInterval(decrementQT, 500); // fast interval for testing only! change for submission!
+    }
+}
+
+
+// answer timer functions
+//
+function stopAT() {
+    if (answerTimerRunning === true) {    
+        answerTimerRunning = false;
+        clearInterval(answerIntervalID);
+        answerTimer = 0;
+        document.getElementById("questionTimer").textContent = `Next question in: ${answerTimer}`;
+    }
+}
+
+function decrementAT() {
+    if (answerTimerRunning === true) {
+        if (answerTimer === 0) {
+            stopAT();
+        }
+        document.getElementById("questionTimer").textContent = `Next question in: ${answerTimer}`;
+        answerTimer--;
+        console.log(answerTimer);
+        
+    }
+    
+}
+
+function startAT() {
+    if (answerTimerRunning === false) {
+        answerTimerRunning = true;
+        answerTimer = 3;
+        document.getElementById("questionTimer").textContent = `Next question in: ${answerTimer}`;
+        answerIntervalID = setInterval(decrementAT, 500); // fast interval for testing only! change for submission!
+    }
+}
 
 // tiny TriviaGame:
     // one question, one answer choice, and timer
@@ -82,15 +136,25 @@ function decrementQT() {
 
 function triviaQuestion() {
     // starts the timer at X seconds
-    questionTimer = 3;
-    questionTimerRunning = true;
-    setInterval(decrementQT, 1000);
+    stopAT()
+    startQT()
     nthQuestion += 1;
     document.getElementById("questionCount").textContent = `Question ${nthQuestion} of ${questionsCount.length}`;
-    document.getElementById("triviaTextarea").textContent = `Here is the trivia question.`;
-    document.getElementById("triviaChoices").textContent = `Possible answer.`;
+    
+    if (nthQuestion === 1) {
+        document.getElementById("triviaTextarea").textContent = questions.q1.text;
+        document.getElementById("triviaChoices").innerHTML = `<p>${questions.q1.choices.correct}</p>
+        <p>${questions.q1.choices.incorrect1}</p>`;
 
-    setTimeout(showAnswer, 4000);
+    }
+    if (nthQuestion === 2) {
+        document.getElementById("triviaTextarea").textContent = `Here is the second trivia question.`;
+        document.getElementById("triviaChoices").textContent = `Possible answer for 2nd question.`;
+
+    }
+    // document.getElementById("triviaChoices").textContent = `Possible answer.`;
+
+    setTimeout(showAnswer, 3200);
 
 
 }
@@ -100,8 +164,10 @@ function triviaQuestion() {
 // function to display the correct answer for the previous question
 //
 function showAnswer() {
-    // stop the timer
+    // stop the questiontimer
     stopQT()
+    // start countdown to next question
+    startAT()
 
     
     // if the user selected the correct answer
@@ -115,14 +181,7 @@ function showAnswer() {
     // else if the user ran out of time
     // display "out of time" message along with correct answer & additional info
 
-    // start countdown to next question
-    // leaving this here because we will change it into a separate answer timer function that will get called
-    // within this showAnswer function
-    questionTimer = 3;
-    questionTimerRunning = true;
-    setInterval(decrementQT, 1000);
-    document.getElementById("questionTimer").textContent = `Next question in: ${questionTimer}`;
-
+    
 
     // display the answer to the previous question -- should look different for correct vs incorrect response
     document.getElementById("questionCount").textContent = "";
@@ -137,11 +196,21 @@ function showAnswer() {
             triviaQuestion()
         }
     }
-    setTimeout(lastQuestioncheck, 4000);
+    setTimeout(lastQuestioncheck, 2500);
 }
 
 function displayUserStats() {
-    stopQT()
+    stopAT()
+    // clear out the other fields
+    document.getElementById("questionCount").textContent = "";
+    document.getElementById("questionTimer").textContent = "";
+    document.getElementById("triviaTextarea").textContent = "Here's how you did!";
+    document.getElementById("triviaChoices").textContent = "";
+
+    // display the user stats
+    document.getElementById("userResults").innerHTML = `<p>Correct answers: ${qCorrect}</p>
+    <p>Incorrect answers: ${qIncorrect}</p>`;
+
 
     // button for gameresults page -- still need to code it to reset the game tho!
     document.getElementById("playAgain").style.display = "block";
@@ -149,4 +218,3 @@ function displayUserStats() {
 
 triviaQuestion();
 // on-click events for each answer choice
-
