@@ -13,29 +13,45 @@ var nthQuestion = 0;
 
 
 
-// should i make an object for the set of questions?
-// for example
-
+// TO DO: make a good structure for our questions
+//        assign class to correct answer only?
 var questions = {
-    q1: {
+    1: {
         text: "what color is the sky?",
         choices: {
-            correct: "blue",
-            incorrect1: "tentative",
-            incorrect2: "checkerboard",
-            incorrect3: "candied yams"
+            one: "blue",
+            two: "tentative",
+            three: "checkerboard",
+            four: "candied yams",
+            correct: "blue"
         }
     },
-    q2: {
+    2: {
         text: "what do they say the moon is made of?",
         choices: {
-            correct: "cheese",
-            incorrect1: "beans",
-            incorrect2: "backgammon",
-            incorrect3: "thermometer"
+            one: "cheese",
+            two: "beans",
+            three: "backgammon",
+            four: "thermometer",
+            correct: "cheese"
         }
     },
+    3: {
+        text: "why are dry erase markers dry?",
+        choices: {
+            one: "God",
+            two: "they asked nicely",
+            three: "their solvent is not water",
+            four: "the grapes ripened perfectly",
+            correct: "their solvent is not water"
+        }
+    },
+    
+
 };
+
+// delete later
+console.log(questionNumbers[nthQuestion]);
 
 var qCorrect = 0; // initial value for # of Qs the user has answered correctly
 var qIncorrect = 0; // initial value for # of Qs the user has answered incorrectly
@@ -43,18 +59,9 @@ var questionsCount = Object.keys(questions);
 var qUnanswered = questionsCount.length; // initial value for # of Qs the user has not answered
 console.log(qUnanswered);
 
-console.log(questions.q1.text); // logs correctly "what color is the sky?"
-console.log(questions.q1.choices.incorrect2); // logs correctly "checkerboard"
-
-
 
 // timer at the top of the page
 // gets reset on each new question
-//document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
-
-
-// i think i can delete this
-//questionIntervalID = setInterval(decrementQT, 1000);
 
 
 // should i make general start / stop timer functions and pass in a value for their countdown times?
@@ -141,18 +148,11 @@ function triviaQuestion() {
     nthQuestion += 1;
     document.getElementById("questionCount").textContent = `Question ${nthQuestion} of ${questionsCount.length}`;
     
-    if (nthQuestion === 1) {
-        document.getElementById("triviaTextarea").textContent = questions.q1.text;
-        document.getElementById("triviaChoices").innerHTML = `<p>${questions.q1.choices.correct}</p>
-        <p>${questions.q1.choices.incorrect1}</p>`;
-
-    }
-    if (nthQuestion === 2) {
-        document.getElementById("triviaTextarea").textContent = `Here is the second trivia question.`;
-        document.getElementById("triviaChoices").textContent = `Possible answer for 2nd question.`;
-
-    }
-    // document.getElementById("triviaChoices").textContent = `Possible answer.`;
+    
+    document.getElementById("triviaTextarea").textContent = questions[nthQuestion].text;
+    document.getElementById("triviaChoices").innerHTML = `<p>${questions[nthQuestion].choices.one}</p>
+    <p>${questions[nthQuestion].choices.two}</p><p>${questions[nthQuestion].choices.three}</p>
+    <p>${questions[nthQuestion].choices.four}</p>`;
 
     setTimeout(showAnswer, 3200);
 
@@ -171,6 +171,7 @@ function showAnswer() {
 
     
     // if the user selected the correct answer
+    //if 
     // display "good job!" along with additional info
     // decrement qUnanswered
 
@@ -185,7 +186,8 @@ function showAnswer() {
 
     // display the answer to the previous question -- should look different for correct vs incorrect response
     document.getElementById("questionCount").textContent = "";
-    document.getElementById("triviaTextarea").textContent = `Here is the answer.`;
+    document.getElementById("triviaTextarea").innerHTML = `<p>The correct answer is</p>
+    <p>${questions[nthQuestion].choices.correct}</p>`;
     document.getElementById("triviaChoices").textContent = "";
 
     // check if there aren't anymore questions to ask
