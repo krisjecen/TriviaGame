@@ -51,7 +51,7 @@ var questions = {
 };
 
 // delete later
-console.log(questionNumbers[nthQuestion]);
+// console.log(questionNumbers[nthQuestion]);
 
 var qCorrect = 0; // initial value for # of Qs the user has answered correctly
 var qIncorrect = 0; // initial value for # of Qs the user has answered incorrectly
