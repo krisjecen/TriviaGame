@@ -13,6 +13,7 @@ var answerIntervalID = null;
 
 var nthQuestion = 0;
 var userCorrect = null;
+var outOftime = null;
 
 
 // TO DO: make a good structure for our questions
@@ -120,7 +121,7 @@ function decrementAT() {
         }
         document.getElementById("questionTimer").textContent = `Next question in: ${answerTimer}`;
         answerTimer--;
-        console.log(answerTimer);
+        //console.log(answerTimer);
         
     }
     
@@ -149,10 +150,13 @@ function triviaQuestion() {
     startQT()
     // increment the question so we display the correct content
     nthQuestion += 1;
+    console.log(`${nthQuestion} of ${questionsCount.length}`);
+    // reset userCorrect from previous question response
+    userCorrect = null;
     // display question number so user has an idea of their progress in the game
-    document.getElementById("questionCount").textContent = `Question ${nthQuestion} of ${questionsCount.length}`;
+    document.getElementById("questionCount").innerHTML = `<p>Question ${nthQuestion} of ${questionsCount.length}</p>`;
     // display question text
-    document.getElementById("triviaTextarea").textContent = questions[nthQuestion].text;
+    document.getElementById("triviaTextarea").innerHTML = `<p>${questions[nthQuestion].text}</p>`;
     // assign classes to answer choices & display them
     document.getElementById("triviaChoices").innerHTML = 
     `<p class="possibleAnswer">${questions[nthQuestion].choices.one}</p>
@@ -160,24 +164,37 @@ function triviaQuestion() {
     <p class="possibleAnswer">${questions[nthQuestion].choices.three}</p>
     <p class="possibleAnswer">${questions[nthQuestion].choices.four}</p>`;
     // need to remove these classes (does clearing the innerHTML not remove the classes?)
+
     
     // assign the correct answer to a separate variable that won't get caught up in the click listener
     correctAnswer = questions[nthQuestion].choices.correct;
 
+    // show the answer after a set time if the user does not select a response
+    outOftime = setTimeout(showAnswer, 3200);
+
     // add event listener for clicks in the container
     // need to remove the event listener after this function ends
     // need to assign this function a name so I can call it later when I remove event listener
-    document.querySelector("#container").addEventListener("click", function(event) {
+    document.querySelector("#container").addEventListener("click", function selectAnswer(event) {
         // if the player clicks one of the answer choices (given the class .possibleAnswer)
         // need to re-validate this
         if (event.target.matches(".possibleAnswer")) {
-            console.log(`you clicked an answer choice`);
-            // decrement qUnanswered
-            qUnanswered--;
+            document.querySelector("#container").removeEventListener("click", selectAnswer);
+            console.log(event.target.textContent);
+            event.stopPropagation(selectAnswer)
+            
+            
+            // stop the timers associated with the question
+            stopQT()
+            clearTimeout(outOftime);
+            
+            //console.log(`you clicked an answer choice`);
+            
             // need to remove the classes assigned to the p elements
+            document.getElementById("triviaChoices").className = document.getElementById("triviaChoices").className.replace(/\bpossibleAnswer\b/g, "");
 
             // if the answer the player clicks is correct
-            if (event.target.textContent === questions[nthQuestion].choices.correct) {
+            if (event.target.textContent === correctAnswer) {
                 console.log(`you clicked ${correctAnswer}`);
                 // assign true to userCorrect, which will be used in showAnswer
                 userCorrect = true;
@@ -194,18 +211,17 @@ function triviaQuestion() {
         }
         
     });
-    // show the answer after a set time if the user does not select a response
-    setTimeout(showAnswer, 3200);
+    
 
 
 }
 
-// check if there aren't anymore questions to ask
-function lastQuestioncheck() {
-    if (nthQuestion === questionsCount.length) {
-        displayUserStats()
-    } else {
+// check that there are still questions remaining to display
+function checkIfNextQuestionExists() {
+    if (nthQuestion < questionsCount.length) {
         triviaQuestion()
+    } else {
+        displayUserStats()
     }
 }   
 // targets & updates question text
@@ -214,8 +230,7 @@ function lastQuestioncheck() {
 // function to display the correct answer for the previous question
 //
 function showAnswer() {
-    // stop the questiontimer
-    stopQT()
+    console.log(userCorrect);
     // start countdown to next question
     startAT()
 
@@ -224,37 +239,39 @@ function showAnswer() {
 
     
     // if the user selected the correct answer
-    if (userCorrect) {
+    if (userCorrect === true) {
         // increment the number of questions they've answered correctly
         qCorrect++;
+        // decrement qUnanswered
+        qUnanswered--;
         // display "good job" / correct answer text
         document.getElementById("triviaTextarea").innerHTML =
         `<p>Good job! The answer was</p>
         <p>${correctAnswer}</p>`;
     }
-    // display "good job!" along with additional info
-
     // else if the user selected an incorrect answer
     else if (userCorrect === false) {
         // increment the number of questions they've answered incorrectly
         qIncorrect++;
+        // decrement qUnanswered
+        qUnanswered--;
         //
         document.getElementById("triviaTextarea").innerHTML =
         `<p>Nope. The answer was</p>
         <p>${correctAnswer}</p>`;
-    } else {                        //the user ran out of time
+    } else { 
+    //the user ran out of time                       
     // display "out of time" message along with correct answer & additional info
         document.getElementById("triviaTextarea").innerHTML =
         `<p>Sorry, out of time. The answer was</p>
         <p>${correctAnswer}</p>`;
     }
 
-    // wait a few seconds, then check to see if the question just asked was the last question
-    // in the questions object    
-    setTimeout(lastQuestioncheck, 2500);
+    // wait a few seconds, then check to see if there's another question to display
+    setTimeout(checkIfNextQuestionExists, 2500);
 }
 
-function resetGamedata() {
+function resetGame() {
     nthQuestion = 0;
     userCorrect = null;
     qCorrect = 0; // initial value for # of Qs the user has answered correctly
@@ -262,8 +279,11 @@ function resetGamedata() {
     questionsCount = Object.keys(questions);
     qUnanswered = questionsCount.length; // initial value for # of Qs the user has not answered
     correctAnswer = null;
+    document.getElementById("triviaTextarea").innerHTML = "";
+    document.getElementById("playAgain").style.display = "none";
     clearInterval(questionIntervalID);
     clearInterval(answerIntervalID);
+    triviaQuestion()
 }
 
 function displayUserStats() {
@@ -279,8 +299,7 @@ function displayUserStats() {
     document.getElementById("triviaTextarea").innerHTML = `<p>Here's how you did!</><p>Correct answers: ${qCorrect}</p>
     <p>Incorrect answers: ${qIncorrect}</p><p>Unanswered questions: ${qUnanswered}</p>`;
 
-    // reset the game data
-    resetGamedata()
+    
     // display button for gameresults page
     document.getElementById("playAgain").style.display = "block";
     
