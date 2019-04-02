@@ -13,7 +13,8 @@ var answerIntervalID = null;
 
 var nthQuestion = 0;
 var userCorrect = null;
-var outOftime = null;
+var outOftimeQuestion = null;
+var outOftimeAnswer = null;
 
 
 // TO DO: make a good structure for our questions
@@ -27,7 +28,8 @@ var questions = {
             three: "checkerboard",
             four: "candied yams",
             correct: "blue"
-        }
+        },
+        result: null,
     },
     2: {
         text: "what do they say the moon is made of?",
@@ -37,7 +39,8 @@ var questions = {
             three: "backgammon",
             four: "thermometer",
             correct: "cheese"
-        }
+        },
+        result: null,
     },
     3: {
         text: "why are dry erase markers dry?",
@@ -47,7 +50,8 @@ var questions = {
             three: "their solvent is not water",
             four: "the grapes ripened perfectly",
             correct: "their solvent is not water"
-        }
+        },
+        result: null,
     },
     
 
@@ -59,8 +63,10 @@ var questions = {
 var qCorrect = 0; // initial value for # of Qs the user has answered correctly
 var qIncorrect = 0; // initial value for # of Qs the user has answered incorrectly
 var questionsCount = Object.keys(questions);
-var qUnanswered = questionsCount.length; // initial value for # of Qs the user has not answered
-console.log(qUnanswered);
+// testing "result" property in questions object instead of initial strategy using counters
+// var qUnanswered = questionsCount.length; // initial value for # of Qs the user has not answered
+qUnanswered = 0;
+// console.log(qUnanswered);
 var correctAnswer = null;
 
 
@@ -170,7 +176,9 @@ function triviaQuestion() {
     correctAnswer = questions[nthQuestion].choices.correct;
 
     // show the answer after a set time if the user does not select a response
-    outOftime = setTimeout(showAnswer, 3200);
+    // 
+    outOftimeQuestion = setTimeout(showAnswer, 3200);
+    
 
     // add event listener for clicks in the container
     // need to remove the event listener after this function ends
@@ -180,13 +188,13 @@ function triviaQuestion() {
         // need to re-validate this
         if (event.target.matches(".possibleAnswer")) {
             document.querySelector("#container").removeEventListener("click", selectAnswer);
-            console.log(event.target.textContent);
-            event.stopPropagation(selectAnswer)
+            //console.log(event.target.textContent);
+            event.stopPropagation(selectAnswer);
             
             
             // stop the timers associated with the question
             stopQT()
-            clearTimeout(outOftime);
+            clearTimeout(outOftimeQuestion);
             
             //console.log(`you clicked an answer choice`);
             
@@ -218,6 +226,8 @@ function triviaQuestion() {
 
 // check that there are still questions remaining to display
 function checkIfNextQuestionExists() {
+    clearTimeout(outOftimeAnswer);
+    console.log(`checking nthQuestion: ${nthQuestion}`);
     if (nthQuestion < questionsCount.length) {
         triviaQuestion()
     } else {
@@ -230,6 +240,10 @@ function checkIfNextQuestionExists() {
 // function to display the correct answer for the previous question
 //
 function showAnswer() {
+    
+    clearTimeout(outOftimeQuestion);
+    // debugging
+    console.log(`showAnswer is running for target ${correctAnswer}`);
     console.log(userCorrect);
     // start countdown to next question
     startAT()
@@ -241,9 +255,12 @@ function showAnswer() {
     // if the user selected the correct answer
     if (userCorrect === true) {
         // increment the number of questions they've answered correctly
-        qCorrect++;
+        //qCorrect++;
         // decrement qUnanswered
-        qUnanswered--;
+        //qUnanswered--;
+        // testing "result" property of questions object instead of qCorrect, qUnanswered counters
+        questions[nthQuestion].result = true;
+
         // display "good job" / correct answer text
         document.getElementById("triviaTextarea").innerHTML =
         `<p>Good job! The answer was</p>
@@ -252,10 +269,13 @@ function showAnswer() {
     // else if the user selected an incorrect answer
     else if (userCorrect === false) {
         // increment the number of questions they've answered incorrectly
-        qIncorrect++;
+        // qIncorrect++;
         // decrement qUnanswered
-        qUnanswered--;
+        // qUnanswered--;
         //
+        // testing "result" property of questions object instead of qCorrect, qUnanswered counters
+        questions[nthQuestion].result = false;
+
         document.getElementById("triviaTextarea").innerHTML =
         `<p>Nope. The answer was</p>
         <p>${correctAnswer}</p>`;
@@ -265,10 +285,12 @@ function showAnswer() {
         document.getElementById("triviaTextarea").innerHTML =
         `<p>Sorry, out of time. The answer was</p>
         <p>${correctAnswer}</p>`;
+        // testing "result" property of questions object instead of qCorrect, qUnanswered counters
+        questions[nthQuestion].result = null;
     }
 
     // wait a few seconds, then check to see if there's another question to display
-    setTimeout(checkIfNextQuestionExists, 2500);
+    outOftimeAnswer = setTimeout(checkIfNextQuestionExists, 2500);
 }
 
 function resetGame() {
@@ -277,8 +299,15 @@ function resetGame() {
     qCorrect = 0; // initial value for # of Qs the user has answered correctly
     qIncorrect = 0; // initial value for # of Qs the user has answered incorrectly
     questionsCount = Object.keys(questions);
-    qUnanswered = questionsCount.length; // initial value for # of Qs the user has not answered
+    // qUnanswered = questionsCount.length; // initial value for # of Qs the user has not answered
+    qUnanswered = 0;
     correctAnswer = null;
+    // to do: make tiny function that clears out the answer results from the previous game
+    for (i = 1; i < (questionsCount.length + 1); i++) {
+        console.log(`before: ${questions[i].result}`);
+        questions[i].result = null;
+        console.log(`after: ${questions[i].result}`);
+    }
     document.getElementById("triviaTextarea").innerHTML = "";
     document.getElementById("playAgain").style.display = "none";
     clearInterval(questionIntervalID);
@@ -286,7 +315,29 @@ function resetGame() {
     triviaQuestion()
 }
 
+// testing "result" property of questions object -- this is our tallier function to be run at the end of the game
+function calculateUserStats() {
+    /* we should not need to clear out the stats each time because they shouldn't carry over
+    into the next game anyway...
+    */
+    console.log(`stats before generation: ${qCorrect}, ${qIncorrect}, ${qUnanswered}`);
+    for (i = 1; i < (questionsCount.length + 1); i++) {
+        if (questions[i].result === true) {
+            qCorrect++;
+        } else if (questions[i].result === false) {
+            qIncorrect++;
+        } else if (questions[i].result === null) {
+            qUnanswered++;
+        }
+        console.log(`stats generating: ${qCorrect}, ${qIncorrect}, ${qUnanswered}`);
+
+    }
+}
+
 function displayUserStats() {
+    
+    calculateUserStats()
+    
     // stop the answerTimer
     stopAT()
     // reset the question counter
