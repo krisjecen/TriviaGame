@@ -17,8 +17,7 @@ var outOftimeQuestion = null;
 var outOftimeAnswer = null;
 
 
-// TO DO: make a good structure for our questions
-//        assign class to correct answer only?
+// trivia questions object
 var questions = {
     1: {
         text: "what color is the sky?",
@@ -57,44 +56,36 @@ var questions = {
 
 };
 
-// delete later
-// console.log(questionNumbers[nthQuestion]);
 
 var qCorrect = 0; // initial value for # of Qs the user has answered correctly
 var qIncorrect = 0; // initial value for # of Qs the user has answered incorrectly
 var questionsCount = Object.keys(questions);
-// testing "result" property in questions object instead of initial strategy using counters
-// var qUnanswered = questionsCount.length; // initial value for # of Qs the user has not answered
-qUnanswered = 0;
-// console.log(qUnanswered);
+var numberOfQuestions = questionsCount.length;
+var qUnanswered = 0;
 var correctAnswer = null;
 
 
-// timer at the top of the page
-// gets reset on each new question
-
-
-// should i make general start / stop timer functions and pass in a value for their countdown times?
-// since the values will probably be different for question vs answer timing
-
+// timer functions
+//
 // question timer functions - stop, decrement, start
+//
 function stopQT() {
     if (questionTimerRunning === true) {
         questionTimerRunning = false;
         clearInterval(questionIntervalID);
         questionTimer = 0;
-        document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
     }
 }
 
 function decrementQT() {
     if (questionTimerRunning === true) {
         if (questionTimer === 0) {
+            document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
             stopQT()
-        }
+        } else {
         document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
         questionTimer--;
-        
+        }
     }
     
 }
@@ -103,12 +94,11 @@ function startQT() {
     if (questionTimerRunning === false) {
         questionTimerRunning = true;
         questionTimer = 5;
-        document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
         questionIntervalID = setInterval(decrementQT, 500); // fast interval for testing only! change for submission!
     }
 }
-
-
+//
+//
 // answer timer functions
 //
 function stopAT() {
@@ -116,17 +106,18 @@ function stopAT() {
         answerTimerRunning = false;
         clearInterval(answerIntervalID);
         answerTimer = 0;
-        document.getElementById("questionTimer").textContent = `Next question in: ${answerTimer}`;
     }
 }
 
 function decrementAT() {
     if (answerTimerRunning === true) {
         if (answerTimer === 0) {
+            document.getElementById("questionTimer").textContent = `Next question in: ${answerTimer}`;
             stopAT()
-        }
+        } else {
         document.getElementById("questionTimer").textContent = `Next question in: ${answerTimer}`;
         answerTimer--;
+        }
         //console.log(answerTimer);
         
     }
@@ -137,30 +128,66 @@ function startAT() {
     if (answerTimerRunning === false) {
         answerTimerRunning = true;
         answerTimer = 3;
-        document.getElementById("questionTimer").textContent = `Next question in: ${answerTimer}`;
         answerIntervalID = setInterval(decrementAT, 500); // fast interval for testing only! change for submission!
     }
 }
 
-// tiny TriviaGame:
-    // one question, one answer choice, and timer
-    // if the one answer is selected, you win
-    // if time runs out, you lose
+// to do: arrange the remaining functions in a sensible order
+
+// function to select answer (capture click)
+function selectAnswer(event) {
+    // if the player clicks one of the answer choices (given the class .possibleAnswer)
+    // need to re-validate this
+    if (event.target.matches(".possibleAnswer")) {
+        document.querySelector("#container").removeEventListener("click", selectAnswer);
+        //console.log(event.target.textContent);
+        event.stopPropagation(selectAnswer);
+        
+        
+        // stop the timers associated with the question
+        stopQT()
+        clearTimeout(outOftimeQuestion);
+        
+        //console.log(`you clicked an answer choice`);
+        
+        // need to remove the classes assigned to the p elements
+        document.getElementById("triviaChoices").className = document.getElementById("triviaChoices").className.replace(/\bpossibleAnswer\b/g, "");
+
+        // if the answer the player clicks is correct
+        if (event.target.textContent === correctAnswer) {
+            console.log(`you clicked ${correctAnswer}`);
+            // assign true to userCorrect, which will be used in showAnswer
+            userCorrect = true;
+            
+            // immediately show the answer instead of waiting for time to run out
+            showAnswer()
+        } else {
+            // assign false to userCorrect, which will be used in showAnswer
+            userCorrect = false;
+            
+            // immediately show the answer instead of waiting for time to run out
+            showAnswer()
+        }
+    }
+    
+}
 
 // function to display a new question (initializing)
-
+// to do: replace the bulk of selectAnswer code with a selectAnswer function call
 function triviaQuestion() {
     // stops the answer timer
     stopAT()
-    // starts the question timer
+    // starts the question timer & displays it (shifted the text display to here from timer fn)
     startQT()
+    document.getElementById("questionTimer").textContent = `Time remaining: ${questionTimer}`;
+
     // increment the question so we display the correct content
     nthQuestion += 1;
-    console.log(`${nthQuestion} of ${questionsCount.length}`);
+    console.log(`${nthQuestion} of ${numberOfQuestions}`);
     // reset userCorrect from previous question response
     userCorrect = null;
     // display question number so user has an idea of their progress in the game
-    document.getElementById("questionCount").innerHTML = `<p>Question ${nthQuestion} of ${questionsCount.length}</p>`;
+    document.getElementById("questionCount").innerHTML = `<p>Question ${nthQuestion} of ${numberOfQuestions}</p>`;
     // display question text
     document.getElementById("triviaTextarea").innerHTML = `<p>${questions[nthQuestion].text}</p>`;
     // assign classes to answer choices & display them
@@ -184,6 +211,7 @@ function triviaQuestion() {
     // need to remove the event listener after this function ends
     // need to assign this function a name so I can call it later when I remove event listener
     document.querySelector("#container").addEventListener("click", function selectAnswer(event) {
+    
         // if the player clicks one of the answer choices (given the class .possibleAnswer)
         // need to re-validate this
         if (event.target.matches(".possibleAnswer")) {
@@ -217,10 +245,8 @@ function triviaQuestion() {
                 showAnswer()
             }
         }
-        
+            
     });
-    
-
 
 }
 
@@ -228,9 +254,9 @@ function triviaQuestion() {
 function checkIfNextQuestionExists() {
     clearTimeout(outOftimeAnswer);
     console.log(`checking nthQuestion: ${nthQuestion}`);
-    if (nthQuestion < questionsCount.length) {
+    if (nthQuestion < numberOfQuestions) {
         triviaQuestion()
-    } else {
+    } else if (nthQuestion === numberOfQuestions) {
         displayUserStats()
     }
 }   
@@ -240,13 +266,21 @@ function checkIfNextQuestionExists() {
 // function to display the correct answer for the previous question
 //
 function showAnswer() {
-    
+    document.querySelector("#container").removeEventListener("click", selectAnswer);
+    stopQT()
     clearTimeout(outOftimeQuestion);
     // debugging
     console.log(`showAnswer is running for target ${correctAnswer}`);
     console.log(userCorrect);
-    // start countdown to next question
-    startAT()
+    // start countdown to next question & display it (shifted from timer fn)
+    
+    if (nthQuestion != numberOfQuestions) {
+        startAT()
+        // do i need this next line? yes the UX seems better with it
+        document.getElementById("questionTimer").textContent = `Next question in: ${answerTimer}`;
+    } else {
+        document.getElementById("questionTimer").innerHTML = "";
+    }
 
     document.getElementById("questionCount").innerHTML = "";
     document.getElementById("triviaChoices").innerHTML = "";
@@ -293,35 +327,43 @@ function showAnswer() {
     outOftimeAnswer = setTimeout(checkIfNextQuestionExists, 2500);
 }
 
-function resetGame() {
+function resetVariables() {
     nthQuestion = 0;
     userCorrect = null;
     qCorrect = 0; // initial value for # of Qs the user has answered correctly
     qIncorrect = 0; // initial value for # of Qs the user has answered incorrectly
     questionsCount = Object.keys(questions);
-    // qUnanswered = questionsCount.length; // initial value for # of Qs the user has not answered
     qUnanswered = 0;
     correctAnswer = null;
-    // to do: make tiny function that clears out the answer results from the previous game
-    for (i = 1; i < (questionsCount.length + 1); i++) {
+    clearInterval(questionIntervalID);
+    clearInterval(answerIntervalID);
+    clearTimeout(outOftimeQuestion);
+    clearTimeout(outOftimeAnswer);
+}
+
+function clearPreviousResults() {
+    for (i = 1; i < (numberOfQuestions + 1); i++) {
         console.log(`before: ${questions[i].result}`);
         questions[i].result = null;
         console.log(`after: ${questions[i].result}`);
     }
+}
+
+function resetGame() {
+    
+    // to do: make tiny function that clears out the answer results from the previous game
+    clearPreviousResults()
     document.getElementById("triviaTextarea").innerHTML = "";
     document.getElementById("playAgain").style.display = "none";
-    clearInterval(questionIntervalID);
-    clearInterval(answerIntervalID);
+    resetVariables()
     triviaQuestion()
 }
 
 // testing "result" property of questions object -- this is our tallier function to be run at the end of the game
 function calculateUserStats() {
-    /* we should not need to clear out the stats each time because they shouldn't carry over
-    into the next game anyway...
-    */
+    
     console.log(`stats before generation: ${qCorrect}, ${qIncorrect}, ${qUnanswered}`);
-    for (i = 1; i < (questionsCount.length + 1); i++) {
+    for (i = 1; i < (numberOfQuestions + 1); i++) {
         if (questions[i].result === true) {
             qCorrect++;
         } else if (questions[i].result === false) {
@@ -356,5 +398,5 @@ function displayUserStats() {
     
 }
 
+// start the game
 triviaQuestion();
-// on-click events for each answer choice
