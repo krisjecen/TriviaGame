@@ -1,7 +1,7 @@
 // js for TriviaGame
-
-// add a window.onload function around everything
-
+"use strict"
+// to do: add a window.onload function around everything?
+// to do: set the timers to reasonable values for a playable game and set the setInterval times to 1000 instead of 500
 // variables / objects
 var questionTimer = 5;
 var questionTimerRunning = false;
@@ -16,12 +16,10 @@ var userCorrect = null;
 var outOftimeQuestion = null;
 var outOftimeAnswer = null;
 
-// trying to avoid running through the stats twice
-// this seems to to solve it
 var userStatsDisplayed = false;
 
 // trivia questions object
-// to do: 
+// to do: update the object with more questions
 var questions = {
     1: {
         text: "A lake has a patch of lily pads growing in it. The lily pad patch doubles in surface area every day. After 48 days, the lily pads have covered the entire surface of the lake. How long did it take them to cover half of the lake?",
@@ -60,11 +58,11 @@ var questions = {
 
 };
 
-
-var qCorrect = 0; // initial value for # of Qs the user has answered correctly
-var qIncorrect = 0; // initial value for # of Qs the user has answered incorrectly
-var questionsCount = Object.keys(questions);
-var numberOfQuestions = questionsCount.length;
+// q is used as shorthand for question in some variables
+var qCorrect = 0; // # of q the player has answered correctly
+var qIncorrect = 0; // # of q the player has answered incorrectly
+var questionsCount = Object.keys(questions); 
+var numberOfQuestions = questionsCount.length; // how many questions are there in the game?
 var qUnanswered = 0;
 var correctAnswer = null;
 
@@ -80,7 +78,7 @@ function stopQT() {
         questionTimer = 0;
     }
 }
-
+// decrement controls the display of the timer
 function decrementQT() {
     if (questionTimerRunning === true) {
         if (questionTimer === 0) {
@@ -91,7 +89,6 @@ function decrementQT() {
         questionTimer--;
         }
     }
-    
 }
 
 function startQT() {
@@ -112,7 +109,7 @@ function stopAT() {
         answerTimer = 0;
     }
 }
-
+// decrement controls the display of the timer
 function decrementAT() {
     if (answerTimerRunning === true) {
         if (answerTimer === 0) {
@@ -122,8 +119,6 @@ function decrementAT() {
         document.getElementById("questionTimer").textContent = `Next question in: ${answerTimer}`;
         answerTimer--;
         }
-        //console.log(answerTimer);
-        
     }
     
 }
@@ -143,8 +138,8 @@ function selectAnswer(event) {
     // if the player clicks one of the answer choices (given the class .possibleAnswer)
     // need to re-validate this
     if (event.target.matches(".possibleAnswer")) {
+        // the next two lines are attempts to throttle the event listener from sending multiple clicks through
         document.querySelector("#container").removeEventListener("click", selectAnswer);
-        //console.log(event.target.textContent);
         event.stopPropagation(selectAnswer);
         
         
@@ -152,23 +147,19 @@ function selectAnswer(event) {
         stopQT()
         clearTimeout(outOftimeQuestion);
         
-        //console.log(`you clicked an answer choice`);
-        
         // need to remove the classes assigned to the p elements
         document.getElementById("triviaChoices").className = document.getElementById("triviaChoices").className.replace(/\bpossibleAnswer\b/g, "");
 
-        // if the answer the player clicks is correct
+        // if the answer the player clicks is correct...
         if (event.target.textContent === correctAnswer) {
             console.log(`you clicked ${correctAnswer}`);
             // assign true to userCorrect, which will be used in showAnswer
             userCorrect = true;
-            
             // immediately show the answer instead of waiting for time to run out
             showAnswer()
         } else {
             // assign false to userCorrect, which will be used in showAnswer
             userCorrect = false;
-            
             // immediately show the answer instead of waiting for time to run out
             showAnswer()
         }
@@ -211,16 +202,22 @@ function triviaQuestion() {
     outOftimeQuestion = setTimeout(showAnswer, 3200);
     
 
-    // add event listener for clicks in the container
-    // need to remove the event listener after this function ends
-    // need to assign this function a name so I can call it later when I remove event listener
+    // event listener for clicks in the container
+    //
+    /* i am not sure how to shorten this portion of code. i have defined the selectAnswer function
+    separately because otherwise my removeEventListener in the first line of showAnswer function
+    doesn't work (i have to define selectAnswer somewhere showAnswer can see it). but it seems like
+    i should be able to remove some of  this addEventListener function description, but when I remove
+    the text between the {} after selectAnswer(event) it doesn't work. i have tried a few variations
+    without success so i'm leaving in all of these lines (again) even though i'm not sure if my
+    removeEventListener is even doing anything at this point.
+    */
     document.querySelector("#container").addEventListener("click", function selectAnswer(event) {
     
         // if the player clicks one of the answer choices (given the class .possibleAnswer)
-        // need to re-validate this
         if (event.target.matches(".possibleAnswer")) {
+            // the next two lines are attempts to throttle the event listener from sending multiple clicks through
             document.querySelector("#container").removeEventListener("click", selectAnswer);
-            //console.log(event.target.textContent);
             event.stopPropagation(selectAnswer);
             
             
@@ -228,23 +225,19 @@ function triviaQuestion() {
             stopQT()
             clearTimeout(outOftimeQuestion);
             
-            //console.log(`you clicked an answer choice`);
-            
             // need to remove the classes assigned to the p elements
             document.getElementById("triviaChoices").className = document.getElementById("triviaChoices").className.replace(/\bpossibleAnswer\b/g, "");
 
-            // if the answer the player clicks is correct
+            // if the answer the player clicks is correct...
             if (event.target.textContent === correctAnswer) {
                 console.log(`you clicked ${correctAnswer}`);
                 // assign true to userCorrect, which will be used in showAnswer
                 userCorrect = true;
-                
                 // immediately show the answer instead of waiting for time to run out
                 showAnswer()
             } else {
                 // assign false to userCorrect, which will be used in showAnswer
                 userCorrect = false;
-                
                 // immediately show the answer instead of waiting for time to run out
                 showAnswer()
             }
@@ -348,7 +341,7 @@ function resetVariables() {
 }
 
 function clearPreviousResults() {
-    for (i = 1; i < (numberOfQuestions + 1); i++) {
+    for (let i = 1; i < (numberOfQuestions + 1); i++) {
         console.log(`before: ${questions[i].result}`);
         questions[i].result = null;
         console.log(`after: ${questions[i].result}`);
@@ -367,7 +360,7 @@ function resetGame() {
 function calculateUserStats() {
     
     console.log(`stats before generation: ${qCorrect}, ${qIncorrect}, ${qUnanswered}`);
-    for (i = 1; i < (numberOfQuestions + 1); i++) {
+    for (let i = 1; i < (numberOfQuestions + 1); i++) {
         if (questions[i].result === true) {
             qCorrect++;
         } else if (questions[i].result === false) {
