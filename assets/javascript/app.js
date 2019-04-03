@@ -16,39 +16,43 @@ var userCorrect = null;
 var outOftimeQuestion = null;
 var outOftimeAnswer = null;
 
+// trying to avoid running through the stats twice
+// this seems to to solve it
+var userStatsDisplayed = false;
 
 // trivia questions object
+// to do: 
 var questions = {
     1: {
-        text: "what color is the sky?",
+        text: "A lake has a patch of lily pads growing in it. The lily pad patch doubles in surface area every day. After 48 days, the lily pads have covered the entire surface of the lake. How long did it take them to cover half of the lake?",
         choices: {
-            one: "blue",
-            two: "tentative",
-            three: "checkerboard",
-            four: "candied yams",
-            correct: "blue"
+            one: "24",
+            two: "25",
+            three: "46",
+            four: "47",
+            correct: "47"
         },
         result: null,
     },
     2: {
-        text: "what do they say the moon is made of?",
+        text: "When someone you don't know well uses group pronouns (like 'we' or 'us') or implies you have a shared predicament, even though it isn't true, it's referred to as...",
         choices: {
-            one: "cheese",
-            two: "beans",
-            three: "backgammon",
-            four: "thermometer",
-            correct: "cheese"
+            one: "typecasting",
+            two: "forced teaming",
+            three: "bikeshedding",
+            four: "charm injection",
+            correct: "forced teaming"
         },
         result: null,
     },
     3: {
-        text: "why are dry erase markers dry?",
+        text: "The only 2020 Presidential candidate running on a platform of Universal Basic Income is...",
         choices: {
-            one: "God",
-            two: "they asked nicely",
-            three: "their solvent is not water",
-            four: "the grapes ripened perfectly",
-            correct: "their solvent is not water"
+            one: "Andrew Yang",
+            two: "Kamala Harris",
+            three: "Bernie Sanders",
+            four: "Elizabeth Warren",
+            correct: "Andrew Yang"
         },
         result: null,
     },
@@ -256,7 +260,8 @@ function checkIfNextQuestionExists() {
     console.log(`checking nthQuestion: ${nthQuestion}`);
     if (nthQuestion < numberOfQuestions) {
         triviaQuestion()
-    } else if (nthQuestion === numberOfQuestions) {
+    } else if (nthQuestion === numberOfQuestions && userStatsDisplayed === false) {
+        userStatsDisplayed = true;
         displayUserStats()
     }
 }   
@@ -297,7 +302,7 @@ function showAnswer() {
 
         // display "good job" / correct answer text
         document.getElementById("triviaTextarea").innerHTML =
-        `<p>Good job! The answer was</p>
+        `<p>Good job! The answer is</p>
         <p>${correctAnswer}</p>`;
     }
     // else if the user selected an incorrect answer
@@ -311,13 +316,13 @@ function showAnswer() {
         questions[nthQuestion].result = false;
 
         document.getElementById("triviaTextarea").innerHTML =
-        `<p>Nope. The answer was</p>
+        `<p>Nope. The answer is</p>
         <p>${correctAnswer}</p>`;
     } else { 
     //the user ran out of time                       
     // display "out of time" message along with correct answer & additional info
         document.getElementById("triviaTextarea").innerHTML =
-        `<p>Sorry, out of time. The answer was</p>
+        `<p>Sorry, out of time. The answer is</p>
         <p>${correctAnswer}</p>`;
         // testing "result" property of questions object instead of qCorrect, qUnanswered counters
         questions[nthQuestion].result = null;
@@ -335,6 +340,7 @@ function resetVariables() {
     questionsCount = Object.keys(questions);
     qUnanswered = 0;
     correctAnswer = null;
+    userStatsDisplayed = false;
     clearInterval(questionIntervalID);
     clearInterval(answerIntervalID);
     clearTimeout(outOftimeQuestion);
@@ -350,8 +356,6 @@ function clearPreviousResults() {
 }
 
 function resetGame() {
-    
-    // to do: make tiny function that clears out the answer results from the previous game
     clearPreviousResults()
     document.getElementById("triviaTextarea").innerHTML = "";
     document.getElementById("playAgain").style.display = "none";
@@ -399,4 +403,4 @@ function displayUserStats() {
 }
 
 // start the game
-triviaQuestion();
+triviaQuestion()
