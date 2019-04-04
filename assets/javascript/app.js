@@ -3,11 +3,11 @@
 // to do: add a window.onload function around everything?
 // to do: set the timers to reasonable values for a playable game and set the setInterval times to 1000 instead of 500
 // variables / objects
-var questionTimer = 5;
+var questionTimer = 20;
 var questionTimerRunning = false;
 var questionIntervalID = null;
 
-var answerTimer = 3;
+var answerTimer = 5;
 var answerTimerRunning = false;
 var answerIntervalID = null;
 
@@ -94,8 +94,8 @@ function decrementQT() {
 function startQT() {
     if (questionTimerRunning === false) {
         questionTimerRunning = true;
-        questionTimer = 5;
-        questionIntervalID = setInterval(decrementQT, 500); // fast interval for testing only! change for submission!
+        questionTimer = 20;
+        questionIntervalID = setInterval(decrementQT, 1000); // fast interval for testing only! change for submission!
     }
 }
 //
@@ -126,8 +126,8 @@ function decrementAT() {
 function startAT() {
     if (answerTimerRunning === false) {
         answerTimerRunning = true;
-        answerTimer = 3;
-        answerIntervalID = setInterval(decrementAT, 500); // fast interval for testing only! change for submission!
+        answerTimer = 5;
+        answerIntervalID = setInterval(decrementAT, 1000); // fast interval for testing only! change for submission!
     }
 }
 
@@ -199,7 +199,7 @@ function triviaQuestion() {
 
     // show the answer after a set time if the user does not select a response
     // 
-    outOftimeQuestion = setTimeout(showAnswer, 3200);
+    outOftimeQuestion = setTimeout(showAnswer, 21500);
     
 
     // event listener for clicks in the container
@@ -322,7 +322,7 @@ function showAnswer() {
     }
 
     // wait a few seconds, then check to see if there's another question to display
-    outOftimeAnswer = setTimeout(checkIfNextQuestionExists, 2500);
+    outOftimeAnswer = setTimeout(checkIfNextQuestionExists, 6000);
 }
 
 function resetVariables() {
