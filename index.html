@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Trivia Game - under construction</title>
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="assets/css/style.css">
     <!-- need to add a favicon for the game -->
     <!-- <link rel="icon" href="assets/images/favicon.png" type="image/ico"> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
     <div id="container">
     <!-- title for game -->
-    <h1>Trivia Game - under construction</h1>
+    <h1>Trivia Game</h1>
     <!-- content box at center of screen? -->
 
     <!-- timer text "time remaining" with countdown -->
@@ -25,20 +26,16 @@
     <!-- trivia question -->
     <div id="triviaTextarea"></div>
 
-    <!-- possible answers with select-one-only (radar?) functionality -->
+    <!-- possible answers -->
     <div id="triviaChoices"></div>
-
-    <!-- it sounds like the whole content of the page is replaced when -->
-    <!-- the user responds. they would then see a congrats/nope screen. -->
-    <!-- also account for them getting it wrong if time runs out before -->
-    <!-- they respond. -->
-
-    <!-- final screen with their total score -->
-
-    <!-- option (button?) to restart the game WITHOUT RELOADIING PAGE OMG -->
+        
     <button type="button" id="playAgain" onclick="resetGame()" style="display: none">Start over?</button>
-    </div>
-
+   
+    <footer>
+        <p>Image by <a href="https://pixabay.com/users/somov73-1639052/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=1041687">somov73</a> from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=1041687">Pixabay</a></p>
+    </footer>
+            
     <script type="text/javascript" src="assets/javascript/app.js"></script>
+    </div>
 </body>
 </html>

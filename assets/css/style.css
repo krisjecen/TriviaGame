@@ -1,0 +1,29 @@
+/* stylesheet for Trivia Game */
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background-image: url(../images/monument.jpg);
+    background-size: 100% cover;
+    
+}
+
+#container {
+    background: rgba(240, 248, 255, 0.5);
+    margin: 5% 20% 2%;
+    padding: 2% 5%;
+    height: 70%;
+}
+
+/* on-mouseover color / border change for answer choices */
+
+footer {
+    margin: 5% 20%;
+    padding: 2% 5%;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
