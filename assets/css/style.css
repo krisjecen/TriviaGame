@@ -14,10 +14,20 @@ body {
     background: rgba(240, 248, 255, 0.5);
     margin: 5% 20% 2%;
     padding: 2% 5%;
-    height: 70%;
+    height: 80%;
+}
+.possibleAnswer {
+    background: rgba(240, 248, 255, 0.5);
+    min-width: 40%;
+    max-width: 80%;
+    padding: 5px 5px 5px 20px;
 }
 
 /* on-mouseover color / border change for answer choices */
+.possibleAnswer:hover {
+    background: rgba(0, 80, 0, 0.5);
+    color: whitesmoke;
+}
 
 footer {
     margin: 5% 20%;

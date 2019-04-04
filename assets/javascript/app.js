@@ -33,7 +33,7 @@ var questions = {
         result: null,
     },
     2: {
-        text: "When someone you don't know well uses group pronouns (like 'we' or 'us') or implies you have a shared predicament, even though it isn't true, it's referred to as...",
+        text: "When someone you don't know well uses group pronouns (like 'we' or 'us') or implies you have a shared predicament (when that isn't true), it's referred to as...",
         choices: {
             one: "typecasting",
             two: "forced teaming",
