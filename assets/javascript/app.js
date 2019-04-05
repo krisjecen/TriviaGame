@@ -24,11 +24,11 @@ var questions = {
     1: {
         text: "A lake has a patch of lily pads growing in it. The lily pad patch doubles in surface area every day. After 48 days, the lily pads have covered the entire surface of the lake. How long did it take them to cover half of the lake?",
         choices: {
-            one: "24",
-            two: "25",
-            three: "46",
-            four: "47",
-            correct: "47"
+            one: "24 days",
+            two: "25 days",
+            three: "46 days",
+            four: "47 days",
+            correct: "47 days"
         },
         result: null,
     },
@@ -44,6 +44,17 @@ var questions = {
         result: null,
     },
     3: {
+        text: "In a more affordable universe, a baseball bat and a baseball cost $11.00 total. The bat costs $10 more than the ball. How much does the ball cost?",
+        choices: {
+            one: "$1.50",
+            two: "$1.00",
+            three: "$0.75",
+            four: "$0.50",
+            correct: "$0.50"
+        },
+        result: null,
+    },
+    4: {
         text: "The only 2020 Presidential candidate running on a platform of Universal Basic Income is...",
         choices: {
             one: "Andrew Yang",
