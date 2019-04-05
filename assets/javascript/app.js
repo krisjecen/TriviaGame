@@ -1,7 +1,7 @@
 // js for TriviaGame
 "use strict"
 // to do: add a window.onload function around everything?
-// to do: set the timers to reasonable values for a playable game and set the setInterval times to 1000 instead of 500
+
 // variables / objects
 var questionTimer = 20;
 var questionTimerRunning = false;
@@ -106,7 +106,7 @@ function startQT() {
     if (questionTimerRunning === false) {
         questionTimerRunning = true;
         questionTimer = 20;
-        questionIntervalID = setInterval(decrementQT, 1000); // fast interval for testing only! change for submission!
+        questionIntervalID = setInterval(decrementQT, 1000);
     }
 }
 //
@@ -138,7 +138,7 @@ function startAT() {
     if (answerTimerRunning === false) {
         answerTimerRunning = true;
         answerTimer = 5;
-        answerIntervalID = setInterval(decrementAT, 1000); // fast interval for testing only! change for submission!
+        answerIntervalID = setInterval(decrementAT, 1000);
     }
 }
 
@@ -163,7 +163,6 @@ function selectAnswer(event) {
 
         // if the answer the player clicks is correct...
         if (event.target.textContent === correctAnswer) {
-            console.log(`you clicked ${correctAnswer}`);
             // assign true to userCorrect, which will be used in showAnswer
             userCorrect = true;
             // immediately show the answer instead of waiting for time to run out
@@ -179,7 +178,9 @@ function selectAnswer(event) {
 }
 
 // function to display a new question (initializing)
-// to do: replace the bulk of selectAnswer code with a selectAnswer function call
+/* to do: replace the bulk of selectAnswer code with a selectAnswer function call.
+edit: i don't know how to do this, see note above the .addEventListener (line ~218).
+*/
 function triviaQuestion() {
     // stops the answer timer
     stopAT()
@@ -189,7 +190,6 @@ function triviaQuestion() {
 
     // increment the question so we display the correct content
     nthQuestion += 1;
-    console.log(`${nthQuestion} of ${numberOfQuestions}`);
     // reset userCorrect from previous question response
     userCorrect = null;
     // display question number so user has an idea of their progress in the game
@@ -241,7 +241,6 @@ function triviaQuestion() {
 
             // if the answer the player clicks is correct...
             if (event.target.textContent === correctAnswer) {
-                console.log(`you clicked ${correctAnswer}`);
                 // assign true to userCorrect, which will be used in showAnswer
                 userCorrect = true;
                 // immediately show the answer instead of waiting for time to run out
@@ -261,7 +260,6 @@ function triviaQuestion() {
 // check that there are still questions remaining to display
 function checkIfNextQuestionExists() {
     clearTimeout(outOftimeAnswer);
-    console.log(`checking nthQuestion: ${nthQuestion}`);
     if (nthQuestion < numberOfQuestions) {
         triviaQuestion()
     } else if (nthQuestion === numberOfQuestions && userStatsDisplayed === false) {
@@ -269,8 +267,6 @@ function checkIfNextQuestionExists() {
         displayUserStats()
     }
 }   
-// targets & updates question text
-// targets & updates answer choices
 
 // function to display the correct answer for the previous question
 //
@@ -278,9 +274,6 @@ function showAnswer() {
     document.querySelector("#container").removeEventListener("click", selectAnswer);
     stopQT()
     clearTimeout(outOftimeQuestion);
-    // debugging
-    console.log(`showAnswer is running for target ${correctAnswer}`);
-    console.log(userCorrect);
     // start countdown to next question & display it (shifted from timer fn)
     
     if (nthQuestion != numberOfQuestions) {
@@ -297,11 +290,7 @@ function showAnswer() {
     
     // if the user selected the correct answer
     if (userCorrect === true) {
-        // increment the number of questions they've answered correctly
-        //qCorrect++;
-        // decrement qUnanswered
-        //qUnanswered--;
-        // testing "result" property of questions object instead of qCorrect, qUnanswered counters
+        // update "result" property of questions object
         questions[nthQuestion].result = true;
 
         // display "good job" / correct answer text
@@ -311,12 +300,7 @@ function showAnswer() {
     }
     // else if the user selected an incorrect answer
     else if (userCorrect === false) {
-        // increment the number of questions they've answered incorrectly
-        // qIncorrect++;
-        // decrement qUnanswered
-        // qUnanswered--;
-        //
-        // testing "result" property of questions object instead of qCorrect, qUnanswered counters
+        // update "result" property of questions object
         questions[nthQuestion].result = false;
 
         document.getElementById("triviaTextarea").innerHTML =
@@ -353,9 +337,7 @@ function resetVariables() {
 
 function clearPreviousResults() {
     for (let i = 1; i < (numberOfQuestions + 1); i++) {
-        console.log(`before: ${questions[i].result}`);
         questions[i].result = null;
-        console.log(`after: ${questions[i].result}`);
     }
 }
 
@@ -367,10 +349,13 @@ function resetGame() {
     triviaQuestion()
 }
 
-// testing "result" property of questions object -- this is our tallier function to be run at the end of the game
+// stat tallying function -- runs at the end of the game
 function calculateUserStats() {
-    
-    console.log(`stats before generation: ${qCorrect}, ${qIncorrect}, ${qUnanswered}`);
+    /* i tried updating the qCorrect & qIncorrect during showAnswer but multiple click events
+    were getting passed into showAnswer, so I opted to toggle a property of the question instead
+    and just tally the results at the end of the game, then if multiple events came through, the
+    stats wouldn't be affected.
+    */
     for (let i = 1; i < (numberOfQuestions + 1); i++) {
         if (questions[i].result === true) {
             qCorrect++;
@@ -379,7 +364,6 @@ function calculateUserStats() {
         } else if (questions[i].result === null) {
             qUnanswered++;
         }
-        console.log(`stats generating: ${qCorrect}, ${qIncorrect}, ${qUnanswered}`);
 
     }
 }
